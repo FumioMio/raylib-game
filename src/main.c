@@ -36,7 +36,7 @@ int main(void) {
 
     BeginMode2D(camera);
 
-    DrawPlayer(player);
+    DrawPlayer(&player);
     EndMode2D();
     EndDrawing();
   }
