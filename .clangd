@@ -1,0 +1,2 @@
+CompileFlags:
+  Add: [-isystem, C:/raylib/raylib/src]
