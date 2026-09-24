@@ -15,7 +15,7 @@ Player InitPlayer(Vector2 pos, float speed, const char *texturePath) {
   player.currentFrameY = 0;
   player.frameCounter = 0;
   player.frameSpeed = 4.0f;
-  player.size = (Vector2){32.0f, 32.0f};
+  player.size = (Vector2){48.0f, 48.0f};
   player.flipX = false;
   return player;
 }
@@ -101,3 +101,5 @@ void DrawPlayer(Player *p) {
 
   DrawTexturePro(p->texture, p->frameRec, destRec, origin, 0, WHITE);
 }
+
+void UnloadPlayer(Player p) { UnloadTexture(p.texture); }
