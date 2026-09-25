@@ -1,2 +1,13 @@
 CompileFlags:
-  Add: [-isystem, C:/raylib/raylib/src]
+  Add:
+    - "-isystem"
+    - "C:/raylib/raylib/src"
+    - "-isystem"
+    - "D:/msys64/mingw64/include"
+    - "-isystem"
+    - "D:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/16.2.0/include"
+    - "-Isrc"
+    - "-Ilocal_include"
+
+Compiler: D:/msys64/mingw64/bin/gcc.exe
+

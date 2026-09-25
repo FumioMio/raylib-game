@@ -12,18 +12,19 @@ OBJECTS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(filter %.c, $(SOURCES))) 
           $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(filter %.cpp, $(SOURCES)))
 
 # Compiler and Flags
-CC = gcc
-CXX = g++
+TOOLCHAIN_PATH = D:/msys64/mingw64/bin
+CC = $(TOOLCHAIN_PATH)/gcc
+CXX = $(TOOLCHAIN_PATH)/g++
 CFLAGS = -Wall -std=c99 -O2
 CXXFLAGS = -Wall -std=c++17 -O2
 
 # Raylib Paths
 RAYLIB_PATH = C:/raylib/raylib
-INCLUDE_PATHS = -Isrc -I$(RAYLIB_PATH)/src -Iinclude
+INCLUDE_PATHS = -Isrc -I$(RAYLIB_PATH)/src -Ilocal_include
 LDFLAGS = -L$(RAYLIB_PATH)/src -Llib
 
 # Windows Libraries required by Raylib
-LDLIBS = -lraylib -lopengl32 -lgdi32 -lwinmm -Wl,--subsystem,windows
+LDLIBS = -lraylib -lopengl32 -lgdi32 -lwinmm 
 
 # Build Rules
 all: $(TARGET)

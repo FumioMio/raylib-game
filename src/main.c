@@ -1,5 +1,17 @@
+#include "background/background.h"
 #include "player/player.h"
 #include "raylib.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAP_WIDTH 30
+#define MAP_HEIGHT 20
+
+int lahankosong[MAP_WIDTH][MAP_HEIGHT];
+int fences[MAP_WIDTH][MAP_HEIGHT];
+
+void LoadMapCsv(const char *filesource);
 
 int main(void) {
 
@@ -8,14 +20,16 @@ int main(void) {
 
   InitWindow(windowWidth, windowHeight, "MyGame");
 
+  LoadMapCsv("assets/grass_updated.csv");
+
   Player player;
 
   player = InitPlayer((Vector2){40.0f, 180.0f}, 50.0f,
                       "assets/Characters/BasicCharakterSpritesheet.png");
 
-  Texture mymap = LoadTexture("assets/mymap.png");
-  Rectangle mapSource = {0.0f, 0.0f, mymap.width, mymap.height};
-  Rectangle mapDst = {0.0f, 0.0f, 480.0f, 320.0f};
+  Background background;
+
+  background = InitBackground("assets/mymap.png");
 
   Vector2 camPos = (Vector2){0.0f, 0.0f};
 
@@ -32,21 +46,50 @@ int main(void) {
 
     camera.target = camPos;
     UpdatePlayer(&player, dt);
+
     BeginDrawing();
+
     ClearBackground(RAYWHITE);
 
     BeginMode2D(camera);
-    DrawTexturePro(mymap, mapSource, mapDst, (Vector2){0.0f, 0.0f}, 0.0f,
-                   WHITE);
+
+    DrawBackground(background);
 
     DrawPlayer(&player);
+
     EndMode2D();
     EndDrawing();
   }
 
   UnloadPlayer(player);
-  UnloadTexture(mymap);
   CloseWindow();
 
   return 0;
+}
+
+void LoadMapCsv(const char *filesource) {
+  FILE *file = fopen(filesource, "r");
+
+  if (file == NULL) {
+    TraceLog(LOG_ERROR, "Gagal membuka file map csv");
+    return;
+  }
+
+  char baris[1024];
+  int r = 0;
+
+  while (fgets(baris, sizeof(baris), file) && r < MAP_HEIGHT) {
+    int c = 0;
+
+    char *token = strtok(baris, ",\n\r");
+    while (token != NULL && c < MAP_WIDTH) {
+      lahankosong[r][c] = atoi(token);
+      c++;
+      token = strtok(NULL, ",\n\r");
+    }
+    r++;
+  }
+
+  fclose(file);
+  TraceLog(LOG_INFO, "peta berhasil di load!!");
 }
