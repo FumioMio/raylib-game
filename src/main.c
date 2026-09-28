@@ -47,6 +47,14 @@ int main(void) {
     camera.target = camPos;
     UpdatePlayer(&player, dt);
 
+    if (IsKeyPressed(KEY_ENTER)) {
+      int locX = player.position.x / 16;
+      int locY = player.position.y / 16;
+
+      TraceLog(LOG_INFO, "apcb %d, %d, %d", lahankosong[locX][locY], locX,
+               locY);
+    }
+
     BeginDrawing();
 
     ClearBackground(RAYWHITE);
@@ -83,7 +91,7 @@ void LoadMapCsv(const char *filesource) {
 
     char *token = strtok(baris, ",\n\r");
     while (token != NULL && c < MAP_WIDTH) {
-      lahankosong[r][c] = atoi(token);
+      lahankosong[c][r] = atoi(token);
       c++;
       token = strtok(NULL, ",\n\r");
     }
