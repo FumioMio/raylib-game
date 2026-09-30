@@ -84,18 +84,18 @@ void LoadMapCsv(const char *filesource) {
   }
 
   char baris[1024];
-  int r = 0;
+  int c = 0;
 
   while (fgets(baris, sizeof(baris), file) && r < MAP_HEIGHT) {
-    int c = 0;
+    int r = 0;
 
     char *token = strtok(baris, ",\n\r");
     while (token != NULL && c < MAP_WIDTH) {
       lahankosong[c][r] = atoi(token);
-      c++;
+      r++;
       token = strtok(NULL, ",\n\r");
     }
-    r++;
+    c++;
   }
 
   fclose(file);
