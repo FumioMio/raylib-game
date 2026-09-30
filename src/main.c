@@ -20,7 +20,10 @@ int main(void) {
 
   InitWindow(windowWidth, windowHeight, "MyGame");
 
-  LoadMapCsv("assets/grass_updated.csv");
+  LoadMapCsv("assets/mymap_farmable.csv");
+
+  Texture2D dirtText = LoadTexture("assets/Tilesets/Tilled_Dirt.png");
+  Rectangle dirtRec = {48.0f, 48.0f, 16.0f, 16.0f};
 
   Player player;
 
@@ -53,6 +56,7 @@ int main(void) {
 
       TraceLog(LOG_INFO, "apcb %d, %d, %d", lahankosong[locX][locY], locX,
                locY);
+      lahankosong[locX][locY] = 0;
     }
 
     BeginDrawing();
@@ -63,12 +67,23 @@ int main(void) {
 
     DrawBackground(background);
 
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+      for (int x = 0; x < MAP_WIDTH; x++) {
+        if (lahankosong[x][y] > 0) {
+          Vector2 destPos = {(float){x * 16}, (float){y * 16}};
+
+          DrawTextureRec(dirtText, dirtRec, destPos, WHITE);
+        }
+      }
+    }
+
     DrawPlayer(&player);
 
     EndMode2D();
     EndDrawing();
   }
 
+  UnloadTexture(dirtText);
   UnloadPlayer(player);
   CloseWindow();
 
@@ -86,12 +101,12 @@ void LoadMapCsv(const char *filesource) {
   char baris[1024];
   int c = 0;
 
-  while (fgets(baris, sizeof(baris), file) && r < MAP_HEIGHT) {
+  while (fgets(baris, sizeof(baris), file) && c < MAP_HEIGHT) {
     int r = 0;
 
     char *token = strtok(baris, ",\n\r");
     while (token != NULL && c < MAP_WIDTH) {
-      lahankosong[c][r] = atoi(token);
+      lahankosong[r][c] = atoi(token);
       r++;
       token = strtok(NULL, ",\n\r");
     }
