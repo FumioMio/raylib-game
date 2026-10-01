@@ -69,8 +69,17 @@ void UpdatePlayer(Player *p, Land *l, float dt) {
     int targetX = (int){(p->position.x / 16) + p->direction.x};
     int targetY = (int){(p->position.y / 16) + p->direction.y};
 
-    if (l->data[targetY][targetX] == 1) {
-      l->data[targetY][targetX] = 2;
+    if (l->data[targetY][targetX].id == 1) {
+      l->data[targetY][targetX].id = 2;
+    }
+  }
+  if (p->curAction == NONE && IsKeyPressed(KEY_P)) {
+    p->curAction = WATERING;
+    int targetX = (int){(p->position.x / 16) + p->direction.x};
+    int targetY = (int){(p->position.y / 16) + p->direction.y};
+
+    if (l->data[targetY][targetX].id > 1) {
+      l->data[targetY][targetX].isWatered = true;
     }
   }
   if (p->curAction != NONE) {

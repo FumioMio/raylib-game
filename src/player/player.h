@@ -4,10 +4,7 @@
 #include "../land/land.h"
 #include <raylib.h>
 
-enum PlayerAction {
-  NONE = 0,
-  SOILING = 1,
-};
+enum PlayerAction { NONE = 0, SOILING, WATERING };
 
 typedef struct Player {
   Texture2D texture;

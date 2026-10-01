@@ -20,7 +20,7 @@ typedef struct Tile {
 } Tile;
 
 typedef struct Land {
-  int data[MAP_HEIGHT][MAP_WIDTH];
+  Tile data[MAP_HEIGHT][MAP_WIDTH];
   Texture2D texture;
   Texture2D cropTexture;
 } Land;
