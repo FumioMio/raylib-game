@@ -7,6 +7,7 @@ Player InitPlayer(Vector2 pos, float speed, const char *texturePath) {
   Player player;
   player.position = pos;
   player.speed = speed;
+  player.direction = (Vector2){0.0f, 1.0f};
   player.texture = LoadTexture(texturePath);
   player.frameRec =
       (Rectangle){0.0f, 0.0f, (float){player.texture.width / 4.0f},
@@ -17,23 +18,25 @@ Player InitPlayer(Vector2 pos, float speed, const char *texturePath) {
   player.frameSpeed = 4.0f;
   player.size = (Vector2){48.0f, 48.0f};
   player.flipX = false;
+  player.curAction = NONE;
+  player.timer = 0.0f;
   return player;
 }
 
-void AnimatePlayer(Player *p, float dt, Vector2 dir) {
+void AnimatePlayer(Player *p, float dt, Vector2 moveDir) {
   p->frameCounter += dt;
   int animX = 0;
 
-  if (dir.y < 0.0f) {
+  if (moveDir.y < 0.0f) {
     animX = 2;
     p->currentFrameY = 1;
     p->flipX = false;
-  } else if (dir.y > 0.0f) {
+  } else if (moveDir.y > 0.0f) {
     animX = 2;
     p->currentFrameY = 0;
     p->flipX = false;
-  } else if (dir.x != 0.0f) {
-    if (dir.x > 0) {
+  } else if (moveDir.x != 0.0f) {
+    if (moveDir.x > 0) {
       p->flipX = true;
     } else {
       p->flipX = false;
@@ -58,23 +61,47 @@ void AnimatePlayer(Player *p, float dt, Vector2 dir) {
   }
 }
 
-void UpdatePlayer(Player *p, float dt) {
-  Vector2 dir = (Vector2){0.0f, 0.0f};
+void UpdatePlayer(Player *p, Land *l, float dt) {
+
+  // Action
+  if (p->curAction == NONE && IsKeyPressed(KEY_ENTER)) {
+    p->curAction = SOILING;
+    int targetX = (int){(p->position.x / 16) + p->direction.x};
+    int targetY = (int){(p->position.y / 16) + p->direction.y};
+
+    if (l->data[targetY][targetX] == 1) {
+      l->data[targetY][targetX] = 2;
+    }
+  }
+  if (p->curAction != NONE) {
+    p->timer += dt;
+  }
+  if (p->timer >= 1.5f) {
+    p->timer = 0.0f;
+    p->curAction = NONE;
+  }
+
+  // Movement
+  Vector2 moveDir = (Vector2){0.0f, 0.0f};
 
   if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
-    dir.x = 1;
+    moveDir.x = 1;
+    p->direction = (Vector2){1.0f, 0.0f};
   }
   if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
-    dir.y = 1;
+    moveDir.y = 1;
+    p->direction = (Vector2){0.0f, 1.0f};
   }
   if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
-    dir.x = -1;
+    moveDir.x = -1;
+    p->direction = (Vector2){-1.0f, 0.0f};
   }
   if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
-    dir.y = -1;
+    moveDir.y = -1;
+    p->direction = (Vector2){0.0f, -1.0f};
   }
 
-  AnimatePlayer(p, dt, dir);
+  AnimatePlayer(p, dt, moveDir);
 
   if (p->flipX) {
     if (p->frameRec.width > 0) {
@@ -86,11 +113,13 @@ void UpdatePlayer(Player *p, float dt) {
     }
   }
 
-  if (Vector2Length(dir) > 0.0f) {
-    dir = Vector2Normalize(dir);
+  if (Vector2Length(moveDir) > 0.0f) {
+    moveDir = Vector2Normalize(moveDir);
   }
-  Vector2 vel = Vector2Scale(dir, p->speed * dt);
-  p->position = Vector2Add(p->position, vel);
+  Vector2 vel = Vector2Scale(moveDir, p->speed * dt);
+  if (p->curAction == NONE) {
+    p->position = Vector2Add(p->position, vel);
+  }
 }
 
 void DrawPlayer(Player *p) {

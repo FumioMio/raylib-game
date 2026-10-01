@@ -10,8 +10,9 @@ int main(void) {
 
   InitWindow(windowWidth, windowHeight, "MyGame");
 
-  Land farmable =
-      InitLand("assets/mymap_farmable.csv", "assets/Tilesets/Tilled_Dirt.png");
+  Land farmable = InitLand("assets/mymap_farmable.csv",
+                           "assets/Tilesets/Tilled_Dirt_Wide.png",
+                           "assets/Objects/Basic_Plants.png");
 
   Player player;
 
@@ -36,16 +37,7 @@ int main(void) {
     float dt = GetFrameTime();
 
     camera.target = camPos;
-    UpdatePlayer(&player, dt);
-
-    if (IsKeyPressed(KEY_ENTER)) {
-      int locX = (int){player.position.x / 16};
-      int locY = (int){player.position.y / 16};
-
-      if (farmable.data[locY][locX] == 1) {
-        farmable.data[locY][locX] = 2;
-      }
-    }
+    UpdatePlayer(&player, &farmable, dt);
 
     BeginDrawing();
 
