@@ -11,7 +11,7 @@ int main(void) {
   InitWindow(windowWidth, windowHeight, "MyGame");
 
   Land farmable = InitLand("assets/mymap_farmable.csv",
-                           "assets/Tilesets/Tilled_Dirt_Wide.png",
+                           "assets/Tilesets/Tilled_Dirt_Wide_v2.png",
                            "assets/Objects/Basic_Plants.png");
 
   Player player;

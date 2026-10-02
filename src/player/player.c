@@ -82,10 +82,31 @@ void UpdatePlayer(Player *p, Land *l, float dt) {
       l->data[targetY][targetX].isWatered = true;
     }
   }
+  if (p->curAction == NONE && IsKeyPressed(KEY_L)) {
+    p->curAction = PLANTING;
+    int targetX = (int){(p->position.x / 16) + p->direction.x};
+    int targetY = (int){(p->position.y / 16) + p->direction.y};
+
+    if (l->data[targetY][targetX].id > 1 &&
+        l->data[targetY][targetX].cropType == CROPLESS) {
+      l->data[targetY][targetX].cropType = WHEAT;
+    }
+  }
+  if (p->curAction == NONE && IsKeyPressed(KEY_K)) {
+    p->curAction = PLANTING;
+    int targetX = (int){(p->position.x / 16) + p->direction.x};
+    int targetY = (int){(p->position.y / 16) + p->direction.y};
+
+    if (l->data[targetY][targetX].id > 1 &&
+        l->data[targetY][targetX].cropType != CROPLESS) {
+      l->data[targetY][targetX].growthStage++;
+    }
+  }
+
   if (p->curAction != NONE) {
     p->timer += dt;
   }
-  if (p->timer >= 1.5f) {
+  if (p->timer >= 1.0f) {
     p->timer = 0.0f;
     p->curAction = NONE;
   }

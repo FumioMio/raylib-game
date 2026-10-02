@@ -1,14 +1,8 @@
 #ifndef LAND
 #define LAND
 
+#include "../util/util.h"
 #include "raylib.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#define MAP_WIDTH 30
-#define MAP_HEIGHT 20
-
 enum CropType { CROPLESS = 0, WHEAT, TOMAT };
 
 typedef struct Tile {

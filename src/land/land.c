@@ -1,48 +1,34 @@
 #include "land.h"
+#include "../util/util.h"
 #include "raylib.h"
+#include <assert.h>
 #include <stdbool.h>
 
 static const int autoTileMap[16] = {36, 25, 35, 24, 33, 22, 34, 23,
                                     3,  14, 2,  13, 0,  11, 1,  12};
 
-void loadCsv(const char *filesource, Land *l) {
-  FILE *file = fopen(filesource, "r");
-
-  if (file == NULL) {
-    TraceLog(LOG_ERROR, "Gagal membuka file map csv");
-    return;
-  }
-
-  char baris[1024];
-  int c = 0;
-
-  while (fgets(baris, sizeof(baris), file) && c < MAP_HEIGHT) {
-    int r = 0;
-
-    char *token = strtok(baris, ",\n\r");
-    while (token != NULL && r < MAP_WIDTH) {
-      l->data[c][r].id = atoi(token);
-      l->data[c][r].cropType = CROPLESS;
-      l->data[c][r].daysGrown = 0;
-      l->data[c][r].growthStage = 0;
-      l->data[c][r].isWatered = false;
-      r++;
-      token = strtok(NULL, ",\n\r");
-    }
-    c++;
-  }
-
-  fclose(file);
-  TraceLog(LOG_INFO, "peta berhasil di load!!");
-}
-
 Land InitLand(const char *filesource, const char *texturepath,
               const char *croptexturepath) {
   Land l;
-  loadCsv(filesource, &l);
-  l.texture = LoadTexture(texturepath);
-  l.cropTexture = LoadTexture(croptexturepath);
-  return l;
+  CsvLoaded csv;
+  if (LoadCsv(&csv, filesource)) {
+
+    for (int c = 0; c < MAP_HEIGHT; c++) {
+      for (int r = 0; r < MAP_WIDTH; r++) {
+        l.data[c][r].id = csv.data[c][r];
+        l.data[c][r].isWatered = false;
+        l.data[c][r].cropType = CROPLESS;
+        l.data[c][r].daysGrown = 0;
+        l.data[c][r].growthStage = 0;
+      }
+    }
+
+    l.texture = LoadTexture(texturepath);
+    l.cropTexture = LoadTexture(croptexturepath);
+    return l;
+  } else {
+    return l;
+  }
 }
 
 void DrawLand(Land *l) {
@@ -72,9 +58,20 @@ void DrawLand(Land *l) {
         Rectangle frameRec = {(float){srcX}, (float){srcY}, 16, 16};
         Vector2 destPos = {(float){x * 16}, (float){y * 16}};
 
-        Color tileColor = l->data[y][x].isWatered ? BROWN : WHITE;
+        DrawTextureRec(l->texture, frameRec, destPos, WHITE);
 
-        DrawTextureRec(l->texture, frameRec, destPos, tileColor);
+        Tile curTile = l->data[y][x];
+
+        if (curTile.isWatered) {
+          Rectangle water = {(float)(3 * 16), (float)(3 * 16), 16.0f, 16.0f};
+          DrawTextureRec(l->texture, water, destPos, BROWN);
+        }
+        if (curTile.cropType == WHEAT) {
+          Rectangle cropRec = {(float)(16 * (l->data[y][x].growthStage + 1)), 0,
+                               16.0f, 16.0f};
+          Vector2 cropPos = {(float)(x * 16), (float)((y * 16) - 2)};
+          DrawTextureRec(l->cropTexture, cropRec, cropPos, WHITE);
+        }
       }
     }
   }
