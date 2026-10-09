@@ -3,20 +3,30 @@
 #include "raymath.h"
 #include <stdbool.h>
 
-Player InitPlayer(Vector2 pos, float speed, const char *texturePath) {
+Player InitPlayer(Vector2 pos, float speed, const char *basicTexturePath,
+                  const char *actionTexturePath) {
+
+  // Player initialization
   Player player;
+
+  // Player Pos, Speed, Direction, Size
   player.position = pos;
   player.speed = speed;
   player.direction = (Vector2){0.0f, 1.0f};
-  player.texture = LoadTexture(texturePath);
-  player.frameRec =
-      (Rectangle){0.0f, 0.0f, (float){player.texture.width / 4.0f},
-                  (float){player.texture.height / 4.0f}};
+  player.size = (Vector2){48.0f, 48.0f};
+
+  // Texture Load
+  player.basicTexture = LoadTexture(basicTexturePath);
+  player.actionTexture = LoadTexture(actionTexturePath);
+  player.texture = player.basicTexture;
+
+  // Rectangle frame
+  player.frameRec = (Rectangle){0.0f, 0.0f, player.size.x, player.size.y};
+
   player.currentFrameX = 0;
   player.currentFrameY = 0;
   player.frameCounter = 0;
-  player.frameSpeed = 4.0f;
-  player.size = (Vector2){48.0f, 48.0f};
+  player.frameSpeed = (float)(4.0f);
   player.flipX = false;
   player.curAction = NONE;
   player.timer = 0.0f;
@@ -27,38 +37,50 @@ void AnimatePlayer(Player *p, float dt, Vector2 moveDir) {
   p->frameCounter += dt;
   int animX = 0;
 
-  if (moveDir.y < 0.0f) {
-    animX = 2;
-    p->currentFrameY = 1;
-    p->flipX = false;
-  } else if (moveDir.y > 0.0f) {
-    animX = 2;
-    p->currentFrameY = 0;
-    p->flipX = false;
-  } else if (moveDir.x != 0.0f) {
-    if (moveDir.x > 0) {
-      p->flipX = true;
-    } else {
+  // Action Anim
+  if (p->curAction == NONE) {
+    p->texture = p->basicTexture;
+    // Movement anim
+    if (moveDir.y < 0.0f) {
+      animX = 2;
+      p->currentFrameY = 1;
       p->flipX = false;
+    } else if (moveDir.y > 0.0f) {
+      animX = 2;
+      p->currentFrameY = 0;
+      p->flipX = false;
+    } else if (moveDir.x != 0.0f) {
+      if (moveDir.x > 0) {
+        p->flipX = true;
+      } else {
+        p->flipX = false;
+      }
+      animX = 2;
+      p->currentFrameY = 2;
     }
-
-    animX = 2;
-    p->currentFrameY = 2;
+  }
+  if (p->curAction == SOILING) {
+    animX = 0;
+    p->texture = p->actionTexture;
+  }
+  if (p->curAction == WATERING) {
+    animX = 0;
+    p->texture = p->actionTexture;
+    if (p->currentFrameY < 8) {
+      p->currentFrameY += 8;
+    }
   }
 
+  // Anim process
   if (p->frameCounter >= (1.0f / p->frameSpeed)) {
     p->frameCounter = 0.0f;
+    p->currentFrameX++;
     if (p->currentFrameX > (animX + 1) || p->currentFrameX < animX) {
       p->currentFrameX = animX;
     }
-    p->currentFrameX++;
-    if (p->currentFrameX > (animX + 1)) {
-      p->currentFrameX = animX;
-    }
-
-    p->frameRec.x = p->currentFrameX * (p->texture.width / 4.0f);
-    p->frameRec.y = p->currentFrameY * (p->texture.height / 4.0f);
   }
+  p->frameRec.x = p->currentFrameX * p->size.x;
+  p->frameRec.y = p->currentFrameY * p->size.y;
 }
 
 void UpdatePlayer(Player *p, Land *l, float dt) {
@@ -66,10 +88,11 @@ void UpdatePlayer(Player *p, Land *l, float dt) {
   // Action
   if (p->curAction == NONE && IsKeyPressed(KEY_ENTER)) {
     p->curAction = SOILING;
+    p->currentFrameX = 0;
     int targetX = (int){(p->position.x / 16) + p->direction.x};
     int targetY = (int){(p->position.y / 16) + p->direction.y};
 
-    if (l->data[targetY][targetX].id == 1) {
+    if (l->data[targetY][targetX].id == 0) {
       l->data[targetY][targetX].id = 2;
     }
   }
@@ -106,7 +129,7 @@ void UpdatePlayer(Player *p, Land *l, float dt) {
   if (p->curAction != NONE) {
     p->timer += dt;
   }
-  if (p->timer >= 1.0f) {
+  if (p->timer >= 0.5f) {
     p->timer = 0.0f;
     p->curAction = NONE;
   }
@@ -161,4 +184,8 @@ void DrawPlayer(Player *p) {
   DrawTexturePro(p->texture, p->frameRec, destRec, origin, 0, WHITE);
 }
 
-void UnloadPlayer(Player p) { UnloadTexture(p.texture); }
+void UnloadPlayer(Player p) {
+  UnloadTexture(p.basicTexture);
+  UnloadTexture(p.actionTexture);
+  UnloadTexture(p.texture);
+}

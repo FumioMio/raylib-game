@@ -58,14 +58,12 @@ void DrawLand(Land *l) {
         Rectangle frameRec = {(float){srcX}, (float){srcY}, 16, 16};
         Vector2 destPos = {(float){x * 16}, (float){y * 16}};
 
-        DrawTextureRec(l->texture, frameRec, destPos, WHITE);
-
         Tile curTile = l->data[y][x];
 
-        if (curTile.isWatered) {
-          Rectangle water = {(float)(3 * 16), (float)(3 * 16), 16.0f, 16.0f};
-          DrawTextureRec(l->texture, water, destPos, BROWN);
-        }
+        Color tileColor = (curTile.isWatered) ? BROWN : WHITE;
+
+        DrawTextureRec(l->texture, frameRec, destPos, tileColor);
+
         if (curTile.cropType == WHEAT) {
           Rectangle cropRec = {(float)(16 * (l->data[y][x].growthStage + 1)), 0,
                                16.0f, 16.0f};

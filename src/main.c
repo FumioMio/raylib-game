@@ -17,7 +17,8 @@ int main(void) {
   Player player;
 
   player = InitPlayer((Vector2){40.0f, 180.0f}, 50.0f,
-                      "assets/Characters/BasicCharakterSpritesheet.png");
+                      "assets/Characters/BasicCharakterSpritesheet.png",
+                      "assets/Characters/CharAction.png");
 
   Background background;
 
