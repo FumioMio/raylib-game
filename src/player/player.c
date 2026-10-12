@@ -11,6 +11,7 @@ Player InitPlayer(Vector2 pos, float speed, const char *basicTexturePath,
 
   // Player Pos, Speed, Direction, Size
   player.position = pos;
+  player.previousPos = pos;
   player.speed = speed;
   player.direction = (Vector2){0.0f, 1.0f};
   player.size = (Vector2){48.0f, 48.0f};
@@ -22,6 +23,7 @@ Player InitPlayer(Vector2 pos, float speed, const char *basicTexturePath,
 
   // Rectangle frame
   player.frameRec = (Rectangle){0.0f, 0.0f, player.size.x, player.size.y};
+  player.colShape = (Rectangle){pos.x - 5.0f, pos.y, 10.0f, 8.0f};
 
   player.currentFrameX = 0;
   player.currentFrameY = 0;
@@ -83,7 +85,7 @@ void AnimatePlayer(Player *p, float dt, Vector2 moveDir) {
   p->frameRec.y = p->currentFrameY * p->size.y;
 }
 
-void UpdatePlayer(Player *p, Land *l, float dt) {
+void UpdatePlayer(Player *p, Land *l, Cols *obstacle, float dt) {
 
   // Action
   if (p->curAction == NONE && IsKeyPressed(KEY_ENTER)) {
@@ -135,19 +137,21 @@ void UpdatePlayer(Player *p, Land *l, float dt) {
   }
 
   // Movement
+  p->previousPos = p->position;
+
   Vector2 moveDir = (Vector2){0.0f, 0.0f};
 
   if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
     moveDir.x = 1;
     p->direction = (Vector2){1.0f, 0.0f};
   }
-  if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
-    moveDir.y = 1;
-    p->direction = (Vector2){0.0f, 1.0f};
-  }
   if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
     moveDir.x = -1;
     p->direction = (Vector2){-1.0f, 0.0f};
+  }
+  if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
+    moveDir.y = 1;
+    p->direction = (Vector2){0.0f, 1.0f};
   }
   if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
     moveDir.y = -1;
@@ -170,8 +174,29 @@ void UpdatePlayer(Player *p, Land *l, float dt) {
     moveDir = Vector2Normalize(moveDir);
   }
   Vector2 vel = Vector2Scale(moveDir, p->speed * dt);
+
   if (p->curAction == NONE) {
-    p->position = Vector2Add(p->position, vel);
+    p->position.x += vel.x;
+    p->colShape.x = p->position.x - 5;
+
+    for (int i = 0; i < obstacle->actualSize; i++) {
+      Rectangle obs = obstacle->recs[i];
+      if (CheckCollisionRecs(p->colShape, obs)) {
+        p->position.x = p->previousPos.x;
+        break;
+      }
+    }
+
+    p->position.y += vel.y;
+    p->colShape.y = p->position.y;
+
+    for (int i = 0; i < obstacle->actualSize; i++) {
+      Rectangle obs = obstacle->recs[i];
+      if (CheckCollisionRecs(p->colShape, obs)) {
+        p->position.y = p->previousPos.y;
+        break;
+      }
+    }
   }
 }
 
@@ -181,6 +206,7 @@ void DrawPlayer(Player *p) {
 
   Vector2 origin = {p->size.x / 2.0f, p->size.y / 2.0f};
 
+  DrawRectangleRec(p->colShape, WHITE);
   DrawTexturePro(p->texture, p->frameRec, destRec, origin, 0, WHITE);
 }
 

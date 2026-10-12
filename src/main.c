@@ -2,8 +2,13 @@
 #include "land/land.h"
 #include "player/player.h"
 #include "raylib.h"
+#include "util/loadCols.h"
 
 int main(void) {
+
+  Cols obstacle = {0};
+
+  LoadCols("assets/mymap.json", &obstacle);
 
   int windowWidth = 960;
   int windowHeight = 640;
@@ -16,7 +21,7 @@ int main(void) {
 
   Player player;
 
-  player = InitPlayer((Vector2){40.0f, 180.0f}, 50.0f,
+  player = InitPlayer((Vector2){140.0f, 180.0f}, 50.0f,
                       "assets/Characters/BasicCharakterSpritesheet.png",
                       "assets/Characters/CharAction.png");
 
@@ -38,7 +43,7 @@ int main(void) {
     float dt = GetFrameTime();
 
     camera.target = camPos;
-    UpdatePlayer(&player, &farmable, dt);
+    UpdatePlayer(&player, &farmable, &obstacle, dt);
 
     BeginDrawing();
 
@@ -49,6 +54,10 @@ int main(void) {
     DrawBackground(background);
 
     DrawLand(&farmable);
+
+    for (int i = 0; i < obstacle.actualSize; i++) {
+      DrawRectangleRec(obstacle.recs[i], WHITE);
+    }
 
     DrawPlayer(&player);
 
