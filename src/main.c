@@ -55,10 +55,6 @@ int main(void) {
 
     DrawLand(&farmable);
 
-    for (int i = 0; i < obstacle.actualSize; i++) {
-      DrawRectangleRec(obstacle.recs[i], WHITE);
-    }
-
     DrawPlayer(&player);
 
     EndMode2D();

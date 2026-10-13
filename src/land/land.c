@@ -60,7 +60,7 @@ void DrawLand(Land *l) {
 
         Tile curTile = l->data[y][x];
 
-        Color tileColor = (curTile.isWatered) ? BROWN : WHITE;
+        Color tileColor = (curTile.isWatered) ? GetColor(0xdcb98aff) : WHITE;
 
         DrawTextureRec(l->texture, frameRec, destPos, tileColor);
 
