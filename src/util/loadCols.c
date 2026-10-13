@@ -65,27 +65,36 @@ void LoadCols(const char *filepath, Cols *cols) {
 
               struct json_number_s *num_data =
                   json_value_as_number(obj_prop->value);
+
               if (num_data != NULL) {
 
-                if (strcmp(obj_prop->name->string, "x")) {
-                  x = strtof(num_data->number, NULL);
+                const char *prop_name = obj_prop->name->string;
+                float val = strtof(num_data->number, NULL);
+
+                if (strcmp(prop_name, "x") == 0) {
+                  TraceLog(LOG_INFO, "obj x %f%", val);
+                  x = val;
                 }
-                if (strcmp(obj_prop->name->string, "y")) {
-                  y = strtof(num_data->number, NULL);
+                if (strcmp(prop_name, "y") == 0) {
+                  TraceLog(LOG_INFO, "obj y %f%", val);
+                  y = val;
                 }
-                if (strcmp(obj_prop->name->string, "width")) {
-                  width = strtof(num_data->number, NULL);
+                if (strcmp(prop_name, "width") == 0) {
+                  TraceLog(LOG_INFO, "obj width %f%", val);
+                  width = val;
                 }
-                if (strcmp(obj_prop->name->string, "height")) {
-                  height = strtof(num_data->number, NULL);
+                if (strcmp(prop_name, "height") == 0) {
+                  TraceLog(LOG_INFO, "obj height %f%", val);
+                  height = val;
                 }
               }
 
               obj_prop = obj_prop->next;
             }
 
-            cols->recs[rectCount] =
-                (Rectangle){x * 0.5f, y * 0.5f, width * 0.5f, height * 0.5f};
+            cols->recs[rectCount] = (Rectangle){x, y, width, height};
+            TraceLog(LOG_INFO, "rect: %f %f %f %f", cols->recs->x,
+                     cols->recs->y, cols->recs->width, cols->recs->height);
             rectCount++;
             cols->actualSize = rectCount;
 
