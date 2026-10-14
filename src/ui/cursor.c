@@ -1,4 +1,4 @@
-#include "cursor.h"
+#include "ui.h"
 #include <raylib.h>
 
 Cursor InitCursor(Texture2D texture) {

@@ -2,7 +2,7 @@
 #include "land/land.h"
 #include "player/player.h"
 #include "raylib.h"
-#include "ui/cursor.h"
+#include "ui/ui.h"
 #include "util/loadCols.h"
 #include <raymath.h>
 
@@ -19,6 +19,7 @@ int main(void) {
 
   Image icon = LoadImage("icon.png");
   SetWindowIcon(icon);
+  SetExitKey(KEY_NULL);
 
   HideCursor();
 
@@ -41,6 +42,7 @@ int main(void) {
   Texture2D basicUitext =
       LoadTexture("assets/SproutLandUI/spritesheets/basicpack.png");
   Cursor cursor = InitCursor(basicUitext);
+  SettingPanel setpanel = InitSetPanel(basicUitext);
 
   Camera2D camera = {0};
   camera.offset = (Vector2){0.0f, 0.0f};
@@ -56,6 +58,7 @@ int main(void) {
     camera.target = camPos;
     UpdatePlayer(&player, &farmable, &obstacle, dt);
     UpdateCursor(&cursor);
+    UpdateSetPanel(&setpanel, camera);
 
     BeginDrawing();
 
@@ -68,6 +71,8 @@ int main(void) {
     DrawLand(&farmable);
 
     DrawPlayer(&player);
+
+    DrawSetPanel(&setpanel);
 
     EndMode2D();
 
