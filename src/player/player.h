@@ -3,9 +3,10 @@
 
 #include "../land/land.h"
 #include "../util/loadCols.h"
+#include "raymath.h"
 #include <raylib.h>
 
-enum PlayerAction { NONE = 0, SOILING, WATERING, PLANTING };
+enum PlayerAction { NONE = -1, SOILING, WATERING, PLANTING, GROWING };
 
 typedef struct Player {
   Texture2D texture;
@@ -33,4 +34,7 @@ void UpdatePlayer(Player *p, Land *l, Cols *obstacle, float dt);
 void DrawPlayer(Player *p);
 void UnloadPlayer(Player p);
 
+void AnimatePlayer(Player *p, float dt);
+void PlayerAction(Player *p, Land *l, float dt);
+void PlayerMovement(Player *p, Cols *obstacle, float dt);
 #endif // !PLAYER

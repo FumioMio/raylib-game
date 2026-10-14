@@ -1,6 +1,5 @@
 #include "player.h"
-#include "raylib.h"
-#include "raymath.h"
+#include <raylib.h>
 #include <stdbool.h>
 
 Player InitPlayer(Vector2 pos, float speed, const char *basicTexturePath,
@@ -25,6 +24,7 @@ Player InitPlayer(Vector2 pos, float speed, const char *basicTexturePath,
   player.frameRec = (Rectangle){0.0f, 0.0f, player.size.x, player.size.y};
   player.colShape = (Rectangle){pos.x - 5.0f, pos.y, 10.0f, 8.0f};
 
+  // Animation init
   player.currentFrameX = 0;
   player.currentFrameY = 0;
   player.frameCounter = 0;
@@ -32,100 +32,17 @@ Player InitPlayer(Vector2 pos, float speed, const char *basicTexturePath,
   player.flipX = false;
   player.curAction = NONE;
   player.timer = 0.0f;
+
   return player;
-}
-
-void AnimatePlayer(Player *p, float dt, Vector2 moveDir) {
-  p->frameCounter += dt;
-  int animX = 0;
-
-  // Action Anim
-  if (p->curAction == NONE) {
-    p->texture = p->basicTexture;
-    // Movement anim
-    if (moveDir.y < 0.0f) {
-      animX = 2;
-      p->currentFrameY = 1;
-      p->flipX = false;
-    } else if (moveDir.y > 0.0f) {
-      animX = 2;
-      p->currentFrameY = 0;
-      p->flipX = false;
-    } else if (moveDir.x != 0.0f) {
-      if (moveDir.x > 0) {
-        p->flipX = true;
-      } else {
-        p->flipX = false;
-      }
-      animX = 2;
-      p->currentFrameY = 2;
-    }
-  }
-  if (p->curAction == SOILING) {
-    animX = 0;
-    p->texture = p->actionTexture;
-  }
-  if (p->curAction == WATERING) {
-    animX = 0;
-    p->texture = p->actionTexture;
-    if (p->currentFrameY < 8) {
-      p->currentFrameY += 8;
-    }
-  }
-
-  // Anim process
-  if (p->frameCounter >= (1.0f / p->frameSpeed)) {
-    p->frameCounter = 0.0f;
-    p->currentFrameX++;
-    if (p->currentFrameX > (animX + 1) || p->currentFrameX < animX) {
-      p->currentFrameX = animX;
-    }
-  }
-  p->frameRec.x = p->currentFrameX * p->size.x;
-  p->frameRec.y = p->currentFrameY * p->size.y;
 }
 
 void UpdatePlayer(Player *p, Land *l, Cols *obstacle, float dt) {
 
-  // Action
-  if (p->curAction == NONE && IsKeyPressed(KEY_ENTER)) {
-    p->curAction = SOILING;
-    p->currentFrameX = 0;
-    int targetX = (int){(p->position.x / 16) + p->direction.x};
-    int targetY = (int){(p->position.y / 16) + p->direction.y};
+  if (p->curAction == NONE) {
 
-    if (l->data[targetY][targetX].id == 0) {
-      l->data[targetY][targetX].id = 2;
-    }
-  }
-  if (p->curAction == NONE && IsKeyPressed(KEY_P)) {
-    p->curAction = WATERING;
-    int targetX = (int){(p->position.x / 16) + p->direction.x};
-    int targetY = (int){(p->position.y / 16) + p->direction.y};
+    PlayerAction(p, l, dt);
 
-    if (l->data[targetY][targetX].id > 1) {
-      l->data[targetY][targetX].isWatered = true;
-    }
-  }
-  if (p->curAction == NONE && IsKeyPressed(KEY_L)) {
-    p->curAction = PLANTING;
-    int targetX = (int){(p->position.x / 16) + p->direction.x};
-    int targetY = (int){(p->position.y / 16) + p->direction.y};
-
-    if (l->data[targetY][targetX].id > 1 &&
-        l->data[targetY][targetX].cropType == CROPLESS) {
-      l->data[targetY][targetX].cropType = WHEAT;
-    }
-  }
-  if (p->curAction == NONE && IsKeyPressed(KEY_K)) {
-    p->curAction = PLANTING;
-    int targetX = (int){(p->position.x / 16) + p->direction.x};
-    int targetY = (int){(p->position.y / 16) + p->direction.y};
-
-    if (l->data[targetY][targetX].id > 1 &&
-        l->data[targetY][targetX].cropType != CROPLESS) {
-      l->data[targetY][targetX].growthStage++;
-    }
+    PlayerMovement(p, obstacle, dt);
   }
 
   if (p->curAction != NONE) {
@@ -136,68 +53,7 @@ void UpdatePlayer(Player *p, Land *l, Cols *obstacle, float dt) {
     p->curAction = NONE;
   }
 
-  // Movement
-  p->previousPos = p->position;
-
-  Vector2 moveDir = (Vector2){0.0f, 0.0f};
-
-  if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
-    moveDir.x = 1;
-    p->direction = (Vector2){1.0f, 0.0f};
-  }
-  if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
-    moveDir.x = -1;
-    p->direction = (Vector2){-1.0f, 0.0f};
-  }
-  if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
-    moveDir.y = 1;
-    p->direction = (Vector2){0.0f, 1.0f};
-  }
-  if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
-    moveDir.y = -1;
-    p->direction = (Vector2){0.0f, -1.0f};
-  }
-
-  AnimatePlayer(p, dt, moveDir);
-
-  if (p->flipX) {
-    if (p->frameRec.width > 0) {
-      p->frameRec.width *= -1;
-    }
-  } else {
-    if (p->frameRec.width < 0) {
-      p->frameRec.width *= -1;
-    }
-  }
-
-  if (Vector2Length(moveDir) > 0.0f) {
-    moveDir = Vector2Normalize(moveDir);
-  }
-  Vector2 vel = Vector2Scale(moveDir, p->speed * dt);
-
-  if (p->curAction == NONE) {
-    p->position.x += vel.x;
-    p->colShape.x = p->position.x - 5;
-
-    for (int i = 0; i < obstacle->actualSize; i++) {
-      Rectangle obs = obstacle->recs[i];
-      if (CheckCollisionRecs(p->colShape, obs)) {
-        p->position.x = p->previousPos.x;
-        break;
-      }
-    }
-
-    p->position.y += vel.y;
-    p->colShape.y = p->position.y;
-
-    for (int i = 0; i < obstacle->actualSize; i++) {
-      Rectangle obs = obstacle->recs[i];
-      if (CheckCollisionRecs(p->colShape, obs)) {
-        p->position.y = p->previousPos.y;
-        break;
-      }
-    }
-  }
+  AnimatePlayer(p, dt);
 }
 
 void DrawPlayer(Player *p) {
@@ -206,7 +62,6 @@ void DrawPlayer(Player *p) {
 
   Vector2 origin = {p->size.x / 2.0f, p->size.y / 2.0f};
 
-  DrawRectangleRec(p->colShape, WHITE);
   DrawTexturePro(p->texture, p->frameRec, destRec, origin, 0, WHITE);
 }
 

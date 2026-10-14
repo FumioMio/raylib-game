@@ -2,7 +2,9 @@
 #include "land/land.h"
 #include "player/player.h"
 #include "raylib.h"
+#include "ui/cursor.h"
 #include "util/loadCols.h"
+#include <raymath.h>
 
 int main(void) {
 
@@ -14,6 +16,11 @@ int main(void) {
   int windowHeight = 640;
 
   InitWindow(windowWidth, windowHeight, "MyGame");
+
+  Image icon = LoadImage("icon.png");
+  SetWindowIcon(icon);
+
+  HideCursor();
 
   Land farmable = InitLand("assets/mymap_farmable.csv",
                            "assets/Tilesets/Tilled_Dirt_Wide_v2.png",
@@ -31,6 +38,10 @@ int main(void) {
 
   Vector2 camPos = (Vector2){0.0f, 0.0f};
 
+  Texture2D basicUitext =
+      LoadTexture("assets/SproutLandUI/spritesheets/basicpack.png");
+  Cursor cursor = InitCursor(basicUitext);
+
   Camera2D camera = {0};
   camera.offset = (Vector2){0.0f, 0.0f};
   camera.rotation = 0.0f;
@@ -44,6 +55,7 @@ int main(void) {
 
     camera.target = camPos;
     UpdatePlayer(&player, &farmable, &obstacle, dt);
+    UpdateCursor(&cursor);
 
     BeginDrawing();
 
@@ -58,11 +70,15 @@ int main(void) {
     DrawPlayer(&player);
 
     EndMode2D();
+
+    DrawCursor(&cursor);
+
     EndDrawing();
   }
 
   UnloadLand(farmable);
   UnloadPlayer(player);
+  UnloadTexture(basicUitext);
   CloseWindow();
 
   return 0;

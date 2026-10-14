@@ -72,19 +72,15 @@ void LoadCols(const char *filepath, Cols *cols) {
                 float val = strtof(num_data->number, NULL);
 
                 if (strcmp(prop_name, "x") == 0) {
-                  TraceLog(LOG_INFO, "obj x %f%", val);
                   x = val;
                 }
                 if (strcmp(prop_name, "y") == 0) {
-                  TraceLog(LOG_INFO, "obj y %f%", val);
                   y = val;
                 }
                 if (strcmp(prop_name, "width") == 0) {
-                  TraceLog(LOG_INFO, "obj width %f%", val);
                   width = val;
                 }
                 if (strcmp(prop_name, "height") == 0) {
-                  TraceLog(LOG_INFO, "obj height %f%", val);
                   height = val;
                 }
               }
@@ -93,8 +89,6 @@ void LoadCols(const char *filepath, Cols *cols) {
             }
 
             cols->recs[rectCount] = (Rectangle){x, y, width, height};
-            TraceLog(LOG_INFO, "rect: %f %f %f %f", cols->recs->x,
-                     cols->recs->y, cols->recs->width, cols->recs->height);
             rectCount++;
             cols->actualSize = rectCount;
 
