@@ -14,8 +14,8 @@ Cursor InitCursor(Texture2D texture) {
   return cursor;
 }
 
-void UpdateCursor(Cursor *c) {
-  c->position = GetMousePosition();
+void UpdateCursor(Cursor *c, Camera2D cam) {
+  c->position = GetScreenToWorld2D(GetMousePosition(), cam);
   if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) ||
       IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
     c->frameRec.x = (float)(368.0f);
@@ -25,8 +25,9 @@ void UpdateCursor(Cursor *c) {
 }
 
 void DrawCursor(Cursor *c) {
-  Rectangle destCursor = {c->position.x, c->position.y,
-                          c->frameRec.width * 2.0f, c->frameRec.height * 2.0f};
+  Rectangle destCursor = {(float)((int)(c->position.x)),
+                          (float)((int)(c->position.y)), c->frameRec.width,
+                          c->frameRec.height};
 
   DrawTexturePro(c->texture, c->frameRec, destCursor, (Vector2){0.0f, 0.0f},
                  0.0f, WHITE);

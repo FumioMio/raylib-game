@@ -12,14 +12,25 @@ int main(void) {
 
   LoadCols("assets/mymap.json", &obstacle);
 
-  int windowWidth = 960;
-  int windowHeight = 640;
+  int virtualWidth = 480;
+  int virtualHeight = 320;
+  int windowScale = 2;
 
-  InitWindow(windowWidth, windowHeight, "MyGame");
+  InitWindow(virtualWidth * windowScale, virtualHeight * windowScale, "MyGame");
 
   Image icon = LoadImage("icon.png");
   SetWindowIcon(icon);
   SetExitKey(KEY_NULL);
+
+  RenderTexture2D target = LoadRenderTexture(virtualWidth, virtualHeight);
+  SetTextureFilter(target.texture, TEXTURE_FILTER_POINT);
+  Rectangle targetSourceRec =
+      (Rectangle){0.0f, 0.0f, (float)(target.texture.width),
+                  (float)(-target.texture.height)};
+  Rectangle targetDestRec =
+      (Rectangle){0.0f, 0.0f, (float)(virtualWidth * windowScale),
+                  (float)(virtualHeight * windowScale)};
+  Vector2 targetOrigin = (Vector2){0.0f, 0.0f};
 
   HideCursor();
 
@@ -41,26 +52,42 @@ int main(void) {
 
   Texture2D basicUitext =
       LoadTexture("assets/SproutLandUI/spritesheets/basicpack.png");
+  Texture2D faceText =
+      LoadTexture("assets/SproutLandUI/spritesheets/Dialouge/Emotes/emote.png");
+  Font pixelFont = LoadFont("assets/SproutLandUI/fonts/pixelFont.ttf");
+
+  Hud myHud = InitHud(basicUitext, faceText, pixelFont);
+
   Cursor cursor = InitCursor(basicUitext);
-  SettingPanel setpanel = InitSetPanel(basicUitext);
+  SettingPanel setpanel = InitSetPanel(basicUitext, pixelFont);
 
   Camera2D camera = {0};
   camera.offset = (Vector2){0.0f, 0.0f};
   camera.rotation = 0.0f;
-  camera.zoom = 2.0f;
+  camera.zoom = 1.0f;
 
   SetTargetFPS(60);
 
   while (!WindowShouldClose()) {
 
+    Camera2D screenCam = {0};
+    screenCam.zoom = (float)(windowScale);
+    screenCam.offset = (Vector2){
+        (float)((GetScreenWidth() - (float)(virtualWidth * windowScale)) *
+                0.5f),
+        (float)((GetScreenHeight() - (float)(virtualHeight * windowScale)) *
+                0.5f)};
+
     float dt = GetFrameTime();
 
     camera.target = camPos;
     UpdatePlayer(&player, &farmable, &obstacle, dt);
-    UpdateCursor(&cursor);
-    UpdateSetPanel(&setpanel, camera);
 
-    BeginDrawing();
+    UpdateSetPanel(&setpanel, cursor);
+
+    UpdateCursor(&cursor, screenCam);
+
+    BeginTextureMode(target);
 
     ClearBackground(RAYWHITE);
 
@@ -72,11 +99,21 @@ int main(void) {
 
     DrawPlayer(&player);
 
-    DrawSetPanel(&setpanel);
-
     EndMode2D();
 
+    DrawHud(&myHud);
+
+    DrawSetPanel(&setpanel);
+
     DrawCursor(&cursor);
+
+    EndTextureMode();
+
+    BeginDrawing();
+    ClearBackground(BLACK);
+
+    DrawTexturePro(target.texture, targetSourceRec, targetDestRec, targetOrigin,
+                   0.0f, WHITE);
 
     EndDrawing();
   }
@@ -84,6 +121,8 @@ int main(void) {
   UnloadLand(farmable);
   UnloadPlayer(player);
   UnloadTexture(basicUitext);
+  UnloadTexture(faceText);
+  UnloadFont(pixelFont);
   CloseWindow();
 
   return 0;

@@ -1,8 +1,9 @@
 #include "ui.h"
+#include <math.h>
 #include <raylib.h>
 #include <stdbool.h>
 
-SettingPanel InitSetPanel(Texture2D texture) {
+SettingPanel InitSetPanel(Texture2D texture, Font font) {
   SettingPanel setpanel;
 
   setpanel.texture = texture;
@@ -22,14 +23,30 @@ SettingPanel InitSetPanel(Texture2D texture) {
   setpanel.visibility = false;
 
   Button btn1;
-  btn1 = InitButton(setpanel.position, texture);
+  btn1 = InitButton(setpanel.position, texture, font);
+  btn1.text = "return";
+  btn1.size.x = 112.0f;
+  btn1.position.y += 60;
+
+  Button btn2;
+  btn2 = InitButton(setpanel.position, texture, font);
+  btn2.text = "quit";
+  btn2.size.x = 112.0f;
+  btn2.position.y += 100;
 
   setpanel.buttons[0] = btn1;
+  setpanel.buttons[1] = btn2;
+
+  Hover hover;
+
+  hover = InitHover(texture);
+
+  setpanel.hover = hover;
 
   return setpanel;
 }
 
-void UpdateSetPanel(SettingPanel *sp, Camera2D cam) {
+void UpdateSetPanel(SettingPanel *sp, Cursor c) {
   if (IsKeyPressed(KEY_ESCAPE)) {
     sp->visibility = !sp->visibility;
   }
@@ -37,20 +54,39 @@ void UpdateSetPanel(SettingPanel *sp, Camera2D cam) {
   if (!sp->visibility)
     return;
 
-  sp->position = GetScreenToWorld2D(
-      (Vector2){(GetScreenWidth() / 2.0f), (GetScreenHeight() / 2.0f)}, cam);
+  for (int i = 0; i < 2; i++) {
+    UpdateButton(&sp->buttons[i], c);
+  }
 
-  UpdateButtonCam(&sp->buttons[0], cam);
+  if (sp->buttons[0].isClicked && sp->visibility != false) {
+    sp->visibility = false;
+  }
+  if (sp->buttons[1].isClicked) {
+    CloseWindow();
+  }
+  if (sp->buttons[1].isHover) {
+    sp->hover.visibility = true;
+    sp->hover.position = sp->buttons[1].position;
+    sp->hover.size.x = sp->buttons[1].size.x;
+    sp->hover.size.y = sp->buttons[1].size.y;
+  } else {
+    sp->hover.visibility = false;
+  }
 }
 
 void DrawSetPanel(SettingPanel *sp) {
   if (!sp->visibility)
     return;
+
   Rectangle destRec = {sp->position.x, sp->position.y, sp->size.x, sp->size.y};
 
   Vector2 origin = {sp->size.x / 2.0f, sp->size.y / 2.0f};
 
   DrawTextureNPatch(sp->texture, sp->ninePatchInf, destRec, origin, 0.0f,
                     WHITE);
-  DrawButton(&sp->buttons[0]);
+  for (int i = 0; i < 2; i++) {
+    DrawButton(&sp->buttons[i]);
+  }
+
+  DrawHover(&sp->hover);
 }
