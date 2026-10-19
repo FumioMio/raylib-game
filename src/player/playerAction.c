@@ -1,4 +1,5 @@
 #include "player.h"
+#include <raylib.h>
 #include <stdbool.h>
 
 void PlayerAction(Player *p, Land *l, float dt) {
@@ -22,13 +23,13 @@ void PlayerAction(Player *p, Land *l, float dt) {
         break;
 
       case PLANTING:
-        curTile.cropType = (curTile.id > 1 && curTile.cropType != NONE)
+        curTile.cropType = (curTile.id > 1 && curTile.cropType == CROPLESS)
                                ? WHEAT
                                : curTile.cropType;
         break;
 
       case GROWING:
-        curTile.growthStage = (curTile.cropType != NONE)
+        curTile.growthStage = (curTile.cropType != CROPLESS)
                                   ? curTile.growthStage + 1
                                   : curTile.growthStage;
         break;
