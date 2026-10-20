@@ -1,7 +1,11 @@
-# Mengabaikan folder external/vendor agar tidak dihitung dalam statistik bahasa
-vendor/* linguist-vendored
-pustaka_pihak_ketiga/* linguist-vendored
+# Paksa semua file header dan source di semua folder menjadi C murni
+**/*.h linguist-language=C
+**/*.c linguist-language=C
 
-# Memaksa semua file .c dan .h dideteksi sebagai bahasa C
-*.c linguist-language=C
-*.h linguist-language=C
+# Jika Anda mengunduh source raylib.h langsung di dalam proyek, sembunyikan dari kalkulasi
+**/raylib.h linguist-vendored
+**/raygui.h linguist-vendored
+
+# Sembunyikan folder build, bin, atau lib pihak ketiga jika ada
+build/* linguist-vendored
+bin/* linguist-vendored
