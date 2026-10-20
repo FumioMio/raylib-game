@@ -1,7 +1,0 @@
-# Mengabaikan folder external/vendor agar tidak dihitung dalam statistik bahasa
-vendor/* linguist-vendored
-pustaka_pihak_ketiga/* linguist-vendored
-
-# Memaksa semua file .c dan .h dideteksi sebagai bahasa C
-*.c linguist-language=C
-*.h linguist-language=C
