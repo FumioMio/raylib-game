@@ -32,7 +32,7 @@ Player InitPlayer(Vector2 pos, float speed, const char *basicTexturePath,
   player.flipX = false;
   player.curAction = NONE;
   player.timer = 0.0f;
-
+  player.anim = InitAnim(player.basicTexture, 0, 1, 12);
   return player;
 }
 

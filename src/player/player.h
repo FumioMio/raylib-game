@@ -2,6 +2,7 @@
 #define PLAYER
 
 #include "../land/land.h"
+#include "../util/animation.h"
 #include "../util/loadCols.h"
 #include "raymath.h"
 #include <raylib.h>
@@ -20,6 +21,7 @@ typedef struct Player {
   Rectangle colShape;
   int currentFrameX;
   int currentFrameY;
+  Anim anim;
   float frameCounter;
   float frameSpeed;
   Vector2 size;
