@@ -18,10 +18,16 @@ Player InitPlayer(Vector2 pos, float speed, const char *basicTexturePath,
   // Texture Load
   player.basicTexture = LoadTexture(basicTexturePath);
   player.actionTexture = LoadTexture(actionTexturePath);
-  player.texture = player.basicTexture;
 
   // Rectangle frame
-  player.frameRec = (Rectangle){0.0f, 0.0f, player.size.x, player.size.y};
+  Rectangle frameRec = (Rectangle){0.0f, 0.0f, player.size.x, player.size.y};
+
+  player.anim[IDLE_DOWN] = InitAnim(player.basicTexture, 0, 1, 12);
+  player.anim[IDLE_UP] = InitAnim(player.basicTexture, 4, 5, 12);
+  player.anim[IDLE_SIDE] = InitAnim(player.basicTexture, 8, 9, 12);
+
+  player.sprite = InitSprite(frameRec, player.basicTexture, player.anim[0].id);
+
   player.colShape = (Rectangle){pos.x - 5.0f, pos.y, 10.0f, 8.0f};
 
   // Animation init
@@ -32,7 +38,6 @@ Player InitPlayer(Vector2 pos, float speed, const char *basicTexturePath,
   player.flipX = false;
   player.curAction = NONE;
   player.timer = 0.0f;
-  player.anim = InitAnim(player.basicTexture, 0, 1, 12);
   return player;
 }
 
@@ -62,11 +67,12 @@ void DrawPlayer(Player *p) {
 
   Vector2 origin = {p->size.x / 2.0f, p->size.y / 2.0f};
 
-  DrawTexturePro(p->texture, p->frameRec, destRec, origin, 0, WHITE);
+  DrawTexturePro(p->sprite.texture, p->sprite.frameRec, destRec, origin, 0,
+                 WHITE);
 }
 
 void UnloadPlayer(Player p) {
   UnloadTexture(p.basicTexture);
   UnloadTexture(p.actionTexture);
-  UnloadTexture(p.texture);
+  UnloadTexture(p.sprite.texture);
 }

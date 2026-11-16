@@ -1,13 +1,27 @@
-#include "animation.h"
+#include "sprite.h"
 #include <raylib.h>
+
+Sprite InitSprite(Rectangle frameRec, Texture2D defaultTexture,
+                  int defaultAnimID) {
+  static int next_sprite_id;
+
+  Sprite sprite;
+
+  sprite.id = next_sprite_id++;
+  sprite.texture = defaultTexture;
+  sprite.frameRec = frameRec;
+  sprite.animId = defaultAnimID;
+
+  return sprite;
+}
 
 Anim InitAnim(Texture2D texture, int startFrame, int endFrame, float speed) {
 
-  static int next_id = 1;
+  static int next_anim_id = 1;
 
   Anim anim;
 
-  anim.id = next_id++;
+  anim.id = next_anim_id++;
   anim.texture = texture;
   anim.startFrame = startFrame;
   anim.endFrame = endFrame;
@@ -18,30 +32,33 @@ Anim InitAnim(Texture2D texture, int startFrame, int endFrame, float speed) {
   return anim;
 }
 
-void PlayAnim(Anim *anim, Texture2D *curTexture, Rectangle *frameRec,
-              float dt) {
+void PlayAnim(Anim *anim, Sprite *sprite, float dt) {
   TraceLog(LOG_INFO,
            "Anim TExture Width : %d , Anim TExture Height : %d \n "
            "curTexture Width : %d , curTexture Height : %d",
-           anim->texture.width, anim->texture.height, curTexture->width,
-           curTexture->height);
+           anim->texture.width, anim->texture.height, sprite->texture.width,
+           sprite->texture.height);
   const int sliceX =
-      (int)((float)((float)(anim->texture.width) / frameRec->width));
+      (int)((float)((float)(anim->texture.width) / sprite->frameRec.width));
   const int sliceY =
-      (int)((float)((float)(anim->texture.height) / frameRec->height));
+      (int)((float)((float)(anim->texture.height) / sprite->frameRec.height));
   TraceLog(LOG_INFO, "Slice X : %d Slice Y : %d", sliceX, sliceY);
-  if (curTexture->id != anim->texture.id) {
-    TraceLog(LOG_INFO, "CurTexture is not AnimTexture, %d %d", curTexture->id,
-             anim->texture.id);
-    curTexture = &anim->texture;
-    TraceLog(LOG_INFO, "CurTexture : %d", curTexture->id);
+  TraceLog(LOG_INFO, "Sprite animId : %d , anim id : %d", sprite->animId,
+           anim->id);
+  if (sprite->animId != anim->id) {
+    TraceLog(LOG_INFO, "CurTexture is not AnimTexture, %d %d",
+             sprite->texture.id, anim->texture.id);
+    sprite->texture = anim->texture;
+    sprite->animId = anim->id;
+    TraceLog(LOG_INFO, "CurTexture : %d", sprite->texture.id);
     anim->curFrame = anim->startFrame;
     anim->timeStamp = 0.0f;
-    frameRec->x = (float)((int)(anim->startFrame % sliceX));
-    frameRec->y = (float)((int)(anim->startFrame / sliceY));
+    sprite->frameRec.x = (float)((int)(anim->startFrame % sliceX));
+    sprite->frameRec.y = (float)((int)(anim->startFrame / sliceY));
     TraceLog(LOG_INFO,
              "Current Frame : %d , Timestamp : %f , Rec_X : %f , Rec_Y : %f",
-             anim->curFrame, anim->timeStamp, frameRec->x, frameRec->y);
+             anim->curFrame, anim->timeStamp, sprite->frameRec.x,
+             sprite->frameRec.y);
   }
   TraceLog(LOG_INFO, "cur tex is same as the anim!");
 
@@ -69,9 +86,9 @@ void PlayAnim(Anim *anim, Texture2D *curTexture, Rectangle *frameRec,
   int frameX = (float)((int)(anim->curFrame % sliceX));
   int frameY = (float)((int)(anim->curFrame / sliceY));
 
-  frameRec->x = frameX * frameRec->width;
-  frameRec->y = frameY * frameRec->height;
+  sprite->frameRec.x = frameX * sprite->frameRec.width;
+  sprite->frameRec.y = frameY * sprite->frameRec.height;
 
-  TraceLog(LOG_INFO, "frameRec_X : %f , frameRec_Y : %f", frameRec->x,
-           frameRec->y);
+  TraceLog(LOG_INFO, "frameRec_X : %f , frameRec_Y : %f", sprite->frameRec.x,
+           sprite->frameRec.y);
 }

@@ -1,20 +1,19 @@
 #include "player.h"
 
 void AnimatePlayer(Player *p, float dt) {
+  int curAnim = 0;
 
-  PlayAnim(&p->anim, &p->texture, &p->frameRec, dt);
+  if (p->direction.y > 0.0f) {
+    curAnim = IDLE_DOWN;
+  } else if (p->direction.y < 0.0f) {
+    curAnim = IDLE_UP;
+  } else if (p->direction.x != 0.0f) {
+    curAnim = IDLE_SIDE;
+  }
+  PlayAnim(&p->anim[curAnim], &p->sprite, dt);
 
   // p->frameCounter += dt;
   // int animX = 0;
-
-  // if (p->direction.y > 0.0f) {
-  //   p->currentFrameY = 0;
-  // } else if (p->direction.y < 0.0f) {
-  //   p->currentFrameY = 1;
-  // } else if (p->direction.x != 0.0f) {
-  //   p->currentFrameY = 2;
-  //   p->flipX = (p->direction.x > 0.0f) ? true : false;
-  // }
 
   //// Action Anim
   // if (p->curAction == NONE) {

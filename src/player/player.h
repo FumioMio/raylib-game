@@ -2,26 +2,26 @@
 #define PLAYER
 
 #include "../land/land.h"
-#include "../util/animation.h"
 #include "../util/loadCols.h"
+#include "../util/sprite.h"
 #include "raymath.h"
 #include <raylib.h>
 
 enum PlayerAction { NONE = -1, SOILING, WATERING, PLANTING, GROWING };
+enum PlayerAnim { IDLE_DOWN = 0, IDLE_UP, IDLE_SIDE };
 
 typedef struct Player {
-  Texture2D texture;
   Texture2D basicTexture;
   Texture2D actionTexture;
   Vector2 position;
   Vector2 previousPos;
   float speed;
   Vector2 direction;
-  Rectangle frameRec;
+  Sprite sprite;
   Rectangle colShape;
   int currentFrameX;
   int currentFrameY;
-  Anim anim;
+  Anim anim[10];
   float frameCounter;
   float frameSpeed;
   Vector2 size;
