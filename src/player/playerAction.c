@@ -39,12 +39,4 @@ void PlayerAction(Player *p, Land *l, float dt) {
       l->data[targetY][targetX] = curTile;
     }
   }
-
-  if (p->curAction != NONE) {
-    p->timer += dt;
-  }
-  if (p->timer >= 0.5f) {
-    p->timer = 0.0f;
-    p->curAction = NONE;
-  }
 }

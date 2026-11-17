@@ -30,6 +30,14 @@ Player InitPlayer(Vector2 pos, float speed, const char *basicTexturePath,
   player.anim[MOVE_UP] = InitAnim(player.basicTexture, 6, 7, 16);
   player.anim[MOVE_SIDE] = InitAnim(player.basicTexture, 10, 11, 16);
 
+  player.anim[WATER_DOWN] = InitAnim(player.actionTexture, 16, 17, 24);
+  player.anim[WATER_UP] = InitAnim(player.actionTexture, 18, 19, 24);
+  player.anim[WATER_SIDE] = InitAnim(player.actionTexture, 20, 21, 24);
+
+  player.anim[SOIL_DOWN] = InitAnim(player.actionTexture, 0, 1, 24);
+  player.anim[SOIL_UP] = InitAnim(player.actionTexture, 2, 3, 24);
+  player.anim[SOIL_SIDE] = InitAnim(player.actionTexture, 4, 5, 24);
+
   player.sprite =
       InitSprite(frameRec, player.basicTexture, player.anim[IDLE_DOWN].id);
 
@@ -47,6 +55,14 @@ void UpdatePlayer(Player *p, Land *l, Cols *obstacle, float dt) {
     PlayerAction(p, l, dt);
 
     PlayerMovement(p, obstacle, dt);
+  }
+
+  if (p->curAction != NONE) {
+    p->timer += dt;
+  }
+  if (p->timer >= 0.5f) {
+    p->timer = 0.0f;
+    p->curAction = NONE;
   }
 
   AnimatePlayer(p, dt);

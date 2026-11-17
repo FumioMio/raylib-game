@@ -20,10 +20,7 @@ enum PlayerAnim {
   SOIL_SIDE,
   WATER_DOWN,
   WATER_UP,
-  WATER_SIDE,
-  PLANT_DOWN,
-  PLANT_UP,
-  PLANT_SIDE
+  WATER_SIDE
 };
 
 typedef struct Player {
@@ -35,9 +32,9 @@ typedef struct Player {
   Vector2 direction;
   Sprite sprite;
   Rectangle colShape;
-  Anim anim[15];
+  Anim anim[12];
   Vector2 size;
-  int curAction;
+  enum PlayerAction curAction;
   float timer;
 } Player;
 

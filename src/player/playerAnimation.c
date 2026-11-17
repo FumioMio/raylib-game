@@ -3,29 +3,29 @@
 void AnimatePlayer(Player *p, float dt) {
   enum PlayerAnim curAnim = IDLE_DOWN;
 
-  if (p->curAction == NONE) {
-    if (p->direction.y > 0.0f) {
-      curAnim = IDLE_DOWN;
-    } else if (p->direction.y < 0.0f) {
-      curAnim = IDLE_UP;
-    } else if (p->direction.x != 0.0f) {
-      curAnim = IDLE_SIDE;
-    }
+  if (p->curAction == WATERING) {
 
-    if (p->position.y > p->previousPos.y) {
-      curAnim = MOVE_DOWN;
-    } else if (p->position.y < p->previousPos.y) {
-      curAnim = MOVE_UP;
-    } else if (p->position.x != p->previousPos.x) {
-      curAnim = MOVE_SIDE;
-    }
+    curAnim = WATER_DOWN;
 
-    p->sprite.flipX =
-        (p->direction.x > 0.0f || p->position.x > p->previousPos.x) ? true
-                                                                    : false;
+  } else if (p->curAction == SOILING) {
 
-    PlayAnim(&p->anim[curAnim], &p->sprite, dt);
+    curAnim = SOIL_DOWN;
+
+  } else {
+
+    curAnim =
+        (p->position.x != p->previousPos.x || p->position.y != p->previousPos.y)
+            ? MOVE_DOWN
+            : IDLE_DOWN;
   }
+
+  curAnim += (p->direction.y < 0.0f) ? 1 : (p->direction.x != 0.0f) ? 2 : 0;
+
+  p->sprite.flipX = (p->direction.x > 0.0f || p->position.x > p->previousPos.x)
+                        ? true
+                        : false;
+
+  PlayAnim(&p->anim[curAnim], &p->sprite, dt);
   // p->frameCounter += dt;
   // int animX = 0;
 

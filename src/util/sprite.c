@@ -87,11 +87,13 @@ void PlayAnim(Anim *anim, Sprite *sprite, float dt) {
   TraceLog(LOG_INFO, "Proceed the frameRec_Transition! Cur frame : %d",
            anim->curFrame);
 
-  int frameX = (float)((int)(anim->curFrame % sliceX));
-  int frameY = (float)((int)(anim->curFrame / sliceY));
+  int frameX = (int)((float)(anim->curFrame % sliceX));
+  int frameY = (int)((float)(anim->curFrame) / (float)(sliceX));
 
-  sprite->frameRec.x = frameX * fabsf(sprite->frameRec.width);
-  sprite->frameRec.y = frameY * fabsf(sprite->frameRec.height);
+  TraceLog(LOG_INFO, "frame_X : %d , frame_Y : %d", frameX, frameY);
+
+  sprite->frameRec.x = (float)(frameX)*fabsf(sprite->frameRec.width);
+  sprite->frameRec.y = (float)(frameY)*fabsf(sprite->frameRec.height);
 
   TraceLog(LOG_INFO, "frameRec_X : %f , frameRec_Y : %f", sprite->frameRec.x,
            sprite->frameRec.y);
