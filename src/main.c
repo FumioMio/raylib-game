@@ -1,16 +1,10 @@
-#include "background/background.h"
-#include "land/land.h"
-#include "player/player.h"
-#include "raylib.h"
+#include "gameScreen/gameScreen.h"
+#include "gameScreen/gameplay.h"
 #include "ui/ui.h"
-#include "util/loadCols.h"
+#include <raylib.h>
 #include <raymath.h>
 
 int main(void) {
-
-  Cols obstacle = {0};
-
-  LoadCols("assets/mymap.json", &obstacle);
 
   int virtualWidth = 480;
   int virtualHeight = 320;
@@ -34,37 +28,16 @@ int main(void) {
 
   HideCursor();
 
-  Land farmable = InitLand("assets/mymap_farmable.csv",
-                           "assets/Tilesets/Tilled_Dirt_Wide_v2.png",
-                           "assets/Objects/Basic_Plants.png");
-
-  Player player;
-
-  player = InitPlayer((Vector2){140.0f, 180.0f}, 50.0f,
-                      "assets/Characters/BasicCharakterSpritesheet.png",
-                      "assets/Characters/CharAction.png");
-
-  Background background;
-
-  background = InitBackground("assets/mymap.png");
-
-  Vector2 camPos = (Vector2){0.0f, 0.0f};
-
   Texture2D basicUitext =
       LoadTexture("assets/SproutLandUI/spritesheets/basicpack.png");
   Texture2D faceText =
       LoadTexture("assets/SproutLandUI/spritesheets/Dialouge/Emotes/emote.png");
   Font pixelFont = LoadFont("assets/SproutLandUI/fonts/pixelFont.ttf");
 
-  Hud myHud = InitHud(basicUitext, faceText, pixelFont);
-
   Cursor cursor = InitCursor(basicUitext);
-  SettingPanel setpanel = InitSetPanel(basicUitext, pixelFont);
 
-  Camera2D camera = {0};
-  camera.offset = (Vector2){0.0f, 0.0f};
-  camera.rotation = 0.0f;
-  camera.zoom = 1.0f;
+  GameObj gameObj;
+  GameUi gameUi;
 
   SetTargetFPS(60);
 
