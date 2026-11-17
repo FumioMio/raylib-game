@@ -8,7 +8,23 @@
 #include <raylib.h>
 
 enum PlayerAction { NONE = -1, SOILING, WATERING, PLANTING, GROWING };
-enum PlayerAnim { IDLE_DOWN = 0, IDLE_UP, IDLE_SIDE };
+enum PlayerAnim {
+  IDLE_DOWN = 0,
+  IDLE_UP,
+  IDLE_SIDE,
+  MOVE_DOWN,
+  MOVE_UP,
+  MOVE_SIDE,
+  SOIL_DOWN,
+  SOIL_UP,
+  SOIL_SIDE,
+  WATER_DOWN,
+  WATER_UP,
+  WATER_SIDE,
+  PLANT_DOWN,
+  PLANT_UP,
+  PLANT_SIDE
+};
 
 typedef struct Player {
   Texture2D basicTexture;
@@ -19,13 +35,8 @@ typedef struct Player {
   Vector2 direction;
   Sprite sprite;
   Rectangle colShape;
-  int currentFrameX;
-  int currentFrameY;
-  Anim anim[10];
-  float frameCounter;
-  float frameSpeed;
+  Anim anim[15];
   Vector2 size;
-  bool flipX;
   int curAction;
   float timer;
 } Player;

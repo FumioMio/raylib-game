@@ -18,6 +18,8 @@ typedef struct Sprite {
   Rectangle frameRec;
   Texture2D texture;
   int animId;
+  bool flipX;
+  bool flipY;
 } Sprite;
 
 Sprite InitSprite(Rectangle frameRec, Texture2D defaultTexture,

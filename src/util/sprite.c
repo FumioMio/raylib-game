@@ -1,5 +1,7 @@
 #include "sprite.h"
+#include <math.h>
 #include <raylib.h>
+#include <stdlib.h>
 
 Sprite InitSprite(Rectangle frameRec, Texture2D defaultTexture,
                   int defaultAnimID) {
@@ -11,6 +13,8 @@ Sprite InitSprite(Rectangle frameRec, Texture2D defaultTexture,
   sprite.texture = defaultTexture;
   sprite.frameRec = frameRec;
   sprite.animId = defaultAnimID;
+  sprite.flipX = false;
+  sprite.flipY = false;
 
   return sprite;
 }
@@ -38,10 +42,10 @@ void PlayAnim(Anim *anim, Sprite *sprite, float dt) {
            "curTexture Width : %d , curTexture Height : %d",
            anim->texture.width, anim->texture.height, sprite->texture.width,
            sprite->texture.height);
-  const int sliceX =
-      (int)((float)((float)(anim->texture.width) / sprite->frameRec.width));
-  const int sliceY =
-      (int)((float)((float)(anim->texture.height) / sprite->frameRec.height));
+  const int sliceX = (int)((float)((float)(anim->texture.width) /
+                                   fabsf(sprite->frameRec.width)));
+  const int sliceY = (int)((float)((float)(anim->texture.height) /
+                                   fabsf(sprite->frameRec.height)));
   TraceLog(LOG_INFO, "Slice X : %d Slice Y : %d", sliceX, sliceY);
   TraceLog(LOG_INFO, "Sprite animId : %d , anim id : %d", sprite->animId,
            anim->id);
@@ -86,8 +90,8 @@ void PlayAnim(Anim *anim, Sprite *sprite, float dt) {
   int frameX = (float)((int)(anim->curFrame % sliceX));
   int frameY = (float)((int)(anim->curFrame / sliceY));
 
-  sprite->frameRec.x = frameX * sprite->frameRec.width;
-  sprite->frameRec.y = frameY * sprite->frameRec.height;
+  sprite->frameRec.x = frameX * fabsf(sprite->frameRec.width);
+  sprite->frameRec.y = frameY * fabsf(sprite->frameRec.height);
 
   TraceLog(LOG_INFO, "frameRec_X : %f , frameRec_Y : %f", sprite->frameRec.x,
            sprite->frameRec.y);
