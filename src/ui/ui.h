@@ -1,8 +1,8 @@
 #ifndef UI_H
 #define UI_H
 
+#include "../gameScreen/gameScreen.h"
 #include <raylib.h>
-
 // Cursor
 typedef struct Cursor {
   Vector2 position;
@@ -58,7 +58,7 @@ typedef struct SettingPanel {
 } SettingPanel;
 
 SettingPanel InitSetPanel(Texture2D texture, Font font);
-void UpdateSetPanel(SettingPanel *sp, Cursor c);
+void UpdateSetPanel(SettingPanel *sp, Cursor c, GameScreen *currentScreen);
 void DrawSetPanel(SettingPanel *sp);
 
 typedef struct FaceUi {
@@ -74,7 +74,8 @@ typedef struct Hud {
   Font font;
 } Hud;
 
-Hud InitHud(Texture2D basicUiText, Texture2D faceText, Font font);
+Hud InitHud(Texture2D basicUiText, const char *faceTextureFilePath, Font font);
 void DrawHud(Hud *hud);
+void UnloadHud(Hud hud);
 
 #endif // !UI_H

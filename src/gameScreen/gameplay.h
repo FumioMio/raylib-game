@@ -11,12 +11,9 @@
 #include <raymath.h>
 
 typedef struct GameUi {
-  Cursor cursor;
+  Cursor *cursor;
   SettingPanel setpanel;
   Hud hud;
-  Texture2D basicUiTexture;
-  Texture2D faceEmoteTexture;
-  Font basicPixelText;
 } GameUi;
 
 typedef struct GameObj {
@@ -27,7 +24,8 @@ typedef struct GameObj {
   Camera2D camera;
 } GameObj;
 
-void InitGameplay(GameObj *gameObj, GameUi *gameUi);
+void InitGameplay(GameObj *gameObj, GameUi *gameUi, Cursor *cursor,
+                  Texture2D basicUiTexture, Font basicPixelText);
 void UpdateGameplay(GameScreen *currentScreen, GameObj *gameObj, GameUi *gameUi,
                     Camera2D screencam);
 void DrawGameplay(GameObj *gameObj, GameUi *gameUi);

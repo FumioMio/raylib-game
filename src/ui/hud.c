@@ -1,12 +1,12 @@
 #include "ui.h"
 #include <raylib.h>
 
-Hud InitHud(Texture2D basicUiText, Texture2D faceText, Font font) {
+Hud InitHud(Texture2D basicUiText, const char *faceTextureFilePath, Font font) {
   FaceUi faceUi;
   faceUi.texture = basicUiText;
   faceUi.position = (Vector2){0.0f, 0.0f};
   faceUi.frameRec = (Rectangle){144.0f, 96.0f, 48.0f, 48.0f};
-  faceUi.faceText = faceText;
+  faceUi.faceText = LoadTexture(faceTextureFilePath);
   faceUi.faceRec = (Rectangle){0.0f, 0.0f, 32.0f, 32.0f};
 
   Hud hud;
@@ -22,3 +22,5 @@ void DrawHud(Hud *hud) {
   DrawTextureRec(hud->faceUi.faceText, hud->faceUi.faceRec,
                  hud->faceUi.position, WHITE);
 }
+
+void UnloadHud(Hud hud) { UnloadTexture(hud.faceUi.texture); }

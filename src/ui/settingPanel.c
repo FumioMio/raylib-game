@@ -1,5 +1,4 @@
 #include "ui.h"
-#include <math.h>
 #include <raylib.h>
 #include <stdbool.h>
 
@@ -46,7 +45,7 @@ SettingPanel InitSetPanel(Texture2D texture, Font font) {
   return setpanel;
 }
 
-void UpdateSetPanel(SettingPanel *sp, Cursor c) {
+void UpdateSetPanel(SettingPanel *sp, Cursor c, GameScreen *currentScreen) {
   if (IsKeyPressed(KEY_ESCAPE)) {
     sp->visibility = !sp->visibility;
   }
@@ -62,7 +61,7 @@ void UpdateSetPanel(SettingPanel *sp, Cursor c) {
     sp->visibility = false;
   }
   if (sp->buttons[1].isClicked) {
-    CloseWindow();
+    *currentScreen = MAIN_MENU;
   }
   if (sp->buttons[1].isHover) {
     sp->hover.visibility = true;

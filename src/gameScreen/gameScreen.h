@@ -6,7 +6,7 @@
 
 typedef enum GameScreen { MAIN_MENU = 0, GAMEPLAY } GameScreen;
 
-void UpdateMainMenu(GameScreen *currentScreen);
-void DrawMainMenu();
+int UpdateMainMenu();
+void DrawMainMenu(Font pixelFont);
 
 #endif // !GAME_SCREEN

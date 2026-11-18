@@ -30,11 +30,11 @@ int main(void) {
 
   Texture2D basicUitext =
       LoadTexture("assets/SproutLandUI/spritesheets/basicpack.png");
-  Texture2D faceText =
-      LoadTexture("assets/SproutLandUI/spritesheets/Dialouge/Emotes/emote.png");
   Font pixelFont = LoadFont("assets/SproutLandUI/fonts/pixelFont.ttf");
 
   Cursor cursor = InitCursor(basicUitext);
+
+  GameScreen currentScreen = MAIN_MENU;
 
   GameObj gameObj;
   GameUi gameUi;
@@ -51,32 +51,38 @@ int main(void) {
         (float)((GetScreenHeight() - (float)(virtualHeight * windowScale)) *
                 0.5f)};
 
-    float dt = GetFrameTime();
-
-    camera.target = camPos;
-    UpdatePlayer(&player, &farmable, &obstacle, dt);
-
-    UpdateSetPanel(&setpanel, cursor);
-
     UpdateCursor(&cursor, screenCam);
+
+    switch (currentScreen) {
+    case MAIN_MENU: {
+      int menuOption = UpdateMainMenu();
+      if (menuOption == 1) {
+        InitGameplay(&gameObj, &gameUi, &cursor, basicUitext, pixelFont);
+        currentScreen = GAMEPLAY;
+      } else if (menuOption == 2) {
+        CloseWindow();
+      }
+    } break;
+    case GAMEPLAY: {
+      UpdateGameplay(&currentScreen, &gameObj, &gameUi, screenCam);
+      if (currentScreen == MAIN_MENU) {
+        UnloadGameplay(&gameObj, &gameUi);
+      }
+    } break;
+    }
 
     BeginTextureMode(target);
 
     ClearBackground(RAYWHITE);
 
-    BeginMode2D(camera);
-
-    DrawBackground(background);
-
-    DrawLand(&farmable);
-
-    DrawPlayer(&player);
-
-    EndMode2D();
-
-    DrawHud(&myHud);
-
-    DrawSetPanel(&setpanel);
+    switch (currentScreen) {
+    case MAIN_MENU: {
+      DrawMainMenu(pixelFont);
+    } break;
+    case GAMEPLAY: {
+      DrawGameplay(&gameObj, &gameUi);
+    } break;
+    }
 
     DrawCursor(&cursor);
 
@@ -91,10 +97,7 @@ int main(void) {
     EndDrawing();
   }
 
-  UnloadLand(farmable);
-  UnloadPlayer(player);
   UnloadTexture(basicUitext);
-  UnloadTexture(faceText);
   UnloadFont(pixelFont);
   CloseWindow();
 
